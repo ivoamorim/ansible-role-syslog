@@ -1,0 +1,50 @@
+# {{ ansible_managed }}
+
+#  Default rules for rsyslog.
+
+{% if ansible_os_family == "Debian" %}
+## First some standard log files.  Log by facility.
+auth,authpriv.*                 /var/log/auth.log
+*.*;auth,authpriv.none          -/var/log/syslog
+cron.*                         /var/log/cron.log
+daemon.*                        -/var/log/daemon.log
+kern.*                          -/var/log/kern.log
+#lpr.*                           -/var/log/lpr.log
+mail.*                          -/var/log/mail.log
+user.*                          -/var/log/user.log
+
+
+## Some "catch-all" log files.
+*.=debug;\
+        auth,authpriv.none;\
+        news.none;mail.none     -/var/log/debug
+*.=info;*.=notice;*.=warn;\
+        auth,authpriv.none;\
+        cron,daemon.none;\
+        mail,news.none          -/var/log/messages
+
+
+## Emergencies are sent to everybody logged in.
+*.emerg                         :omusrmsg:*
+{% else %}
+## Log all kernel messages to the console.
+#kern.*                                                 /dev/console
+
+## First some standard log files.  Log by facility.
+*.info;mail.none;authpriv.none;cron.none                /var/log/messages
+authpriv.*                                              /var/log/secure
+mail.*                                                  -/var/log/maillog
+cron.*                                                  /var/log/cron
+daemon.*                                                -/var/log/daemon
+kern.*                                                  -/var/log/kern
+user.*                                                  -/var/log/user
+
+## Everybody gets emergency messages
+*.emerg                                                 :omusrmsg:*
+
+## Save news errors of level crit and higher in a special file.
+uucp,news.crit                                          /var/log/spooler
+
+## Save boot messages also to boot.log
+local7.*                                                /var/log/boot.log
+{% endif %}

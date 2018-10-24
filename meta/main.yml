@@ -1,0 +1,20 @@
+---
+  ---
+galaxy_info:
+  role_name: syslog
+  author: Ivo Amorim
+  description: install rsyslog and set default rules
+  license: "BSD"
+  min_ansible_version: 1.0
+  platforms:
+    - name: centos
+      versions:
+        - 7
+    - name: debian
+      versions:
+        - 9
+  galaxy_tags:
+    - syslog
+    - rsyslog
+dependencies:
+  - role: ivoamorim.logrotate

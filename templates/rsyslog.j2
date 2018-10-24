@@ -1,0 +1,88 @@
+# {{ ansible_managed }}
+# rsyslog configuration file
+
+#################
+#### MODULES ####
+#################
+
+{% if ansible_os_family == "Debian" %}
+module(load="imuxsock") # provides support for local system logging
+module(load="imklog")   # provides kernel logging support
+#module(load="immark")  # provides --MARK-- message capability
+{% else %}
+$ModLoad imuxsock # provides support for local system logging (e.g. via logger command)
+$ModLoad imjournal # provides access to the systemd journal
+#$ModLoad imklog # reads kernel messages (the same are read from journald)
+#$ModLoad immark  # provides --MARK-- message capability
+{% endif %}
+
+# provides UDP syslog reception
+{% if ansible_os_family == "Debian" %}
+{% if syslog_udp_enable %}
+module(load="imudp")
+input(type="imudp" address="{{ syslog_udp_address }}" port="{{ rsyslog_udp_port }}")
+{% else %}
+#module(load="imudp")
+#input(type="imudp" port="{{ syslog_udp_port }}")
+{% endif %}
+{% else %}
+{% if syslog_udp_enable %}
+$ModLoad imudp
+$UDPServerAddress {{ syslog_udp_address }}
+$UDPServerRun {{ syslog_udp_port }}
+{% else %}
+#$ModLoad imudp
+#$UDPServerAddress {{ syslog_udp_address }}
+#$UDPServerRun {{ syslog_udp_port }}
+{% endif %}
+{% endif %}
+
+
+# provides TCP syslog reception
+{% if ansible_os_family == "Debian" %}
+{% if syslog_tcp_enable %}
+module(load="imtcp")
+input(type="imtcp" address="{{ syslog_tcp_address }}" port="{{ rsyslog_tcp_port }}")
+{% else %}
+#module(load="imtcp")
+#input(type="imtcp" port="{{ syslog_tcp_port }}")
+{% endif %}
+{% else %}
+{% if syslog_tcp_enable %}
+$ModLoad imtcp
+$InputTCPServerAddress {{ syslog_tcp_address }}
+$InputTCPServerRun {{ syslog_tcp_port }}
+{% else %}
+#$ModLoad imtcp
+#$InputTCPServerRun {{ syslog_tcp_port }}
+{% endif %}
+{% endif %}
+
+###########################
+#### GLOBAL DIRECTIVES ####
+###########################
+
+#
+# Use traditional timestamp format.
+# To enable high precision timestamps, comment out the following line.
+#
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+
+#
+# Set the default permissions for all log files.
+#
+$FileOwner rsyslog_priv_drop_to_group
+$FileGroup {{ syslog_file_group }}
+$FileCreateMode 0640
+$DirCreateMode 0755
+$Umask 0022
+
+#
+# Where to place spool and state files
+#
+$WorkDirectory {{ syslog_work_directory }}
+
+#
+# Include all config files in /etc/rsyslog.d/
+#
+$IncludeConfig /etc/rsyslog.d/*.conf

@@ -1,0 +1,25 @@
+---
+logrotate_scripts:
+  - name: "{{ logrotate.name }}"
+    rules:
+      - paths: "{{ logrotate.weekly_paths }}"
+        options:
+          - weekly
+          - rotate 2
+          - dateext
+          - missingok
+          - notifempty
+          - compress
+          - delaycompress
+          - sharedscripts
+        scripts: "{{ logrotate.scripts }}"
+      - paths: "{{ logrotate.daily_paths }}"
+        options:
+          - daily
+          - rotate 7
+          - dateext
+          - missingok
+          - notifempty
+          - compress
+          - delaycompress
+        scripts: "{{ logrotate.scripts }}"
