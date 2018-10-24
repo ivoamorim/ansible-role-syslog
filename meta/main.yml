@@ -1,5 +1,4 @@
 ---
-  ---
 galaxy_info:
   role_name: syslog
   author: Ivo Amorim
@@ -16,5 +15,4 @@ galaxy_info:
   galaxy_tags:
     - syslog
     - rsyslog
-dependencies:
-  - role: ivoamorim.logrotate
+dependencies: []

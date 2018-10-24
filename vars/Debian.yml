@@ -1,21 +1,3 @@
 ---
-rsyslog_file_group: adm
-rsyslog_work_directory: /var/spool/rsyslog
-
-logrotate:
-  name: rsyslog
-  syslog_path: /etc/logrotate.d/rsyslog
-  weekly_paths:
-    - /var/log/kern.log
-    - /var/log/cron.log
-    - /var/log/lpr.log
-    - /var/log/debug
-  daily_paths:
-    - /var/log/syslog
-    - /var/log/mail.log
-    - /var/log/daemon.log
-    - /var/log/auth.log
-    - /var/log/user.log
-    - /var/log/messages
-  scripts:
-    postrotate: "invoke-rc.d rsyslog rotate > /dev/null"
+syslog_file_group: adm
+syslog_work_directory: /var/spool/rsyslog

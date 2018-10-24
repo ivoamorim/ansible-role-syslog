@@ -18,71 +18,71 @@ $ModLoad imjournal # provides access to the systemd journal
 
 # provides UDP syslog reception
 {% if ansible_os_family == "Debian" %}
-{% if syslog_udp_enable %}
+{%   if syslog_udp_enable %}
 module(load="imudp")
 input(type="imudp" address="{{ syslog_udp_address }}" port="{{ rsyslog_udp_port }}")
-{% else %}
+{%   else %}
 #module(load="imudp")
 #input(type="imudp" port="{{ syslog_udp_port }}")
-{% endif %}
+{%   endif %}
 {% else %}
-{% if syslog_udp_enable %}
+{%   if syslog_udp_enable %}
 $ModLoad imudp
 $UDPServerAddress {{ syslog_udp_address }}
 $UDPServerRun {{ syslog_udp_port }}
-{% else %}
+{%   else %}
 #$ModLoad imudp
 #$UDPServerAddress {{ syslog_udp_address }}
 #$UDPServerRun {{ syslog_udp_port }}
-{% endif %}
+{%   endif %}
 {% endif %}
 
 
 # provides TCP syslog reception
 {% if ansible_os_family == "Debian" %}
-{% if syslog_tcp_enable %}
+{%   if syslog_tcp_enable %}
 module(load="imtcp")
 input(type="imtcp" address="{{ syslog_tcp_address }}" port="{{ rsyslog_tcp_port }}")
-{% else %}
+{%   else %}
 #module(load="imtcp")
 #input(type="imtcp" port="{{ syslog_tcp_port }}")
-{% endif %}
+{%   endif %}
 {% else %}
-{% if syslog_tcp_enable %}
+{%   if syslog_tcp_enable %}
 $ModLoad imtcp
 $InputTCPServerAddress {{ syslog_tcp_address }}
 $InputTCPServerRun {{ syslog_tcp_port }}
-{% else %}
+{%   else %}
 #$ModLoad imtcp
 #$InputTCPServerRun {{ syslog_tcp_port }}
-{% endif %}
+{%   endif %}
 {% endif %}
 
 ###########################
 #### GLOBAL DIRECTIVES ####
 ###########################
 
-#
+# Where to place spool and state files
+$WorkDirectory {{ syslog_work_directory }}
+
 # Use traditional timestamp format.
-# To enable high precision timestamps, comment out the following line.
-#
 $ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
 
-#
 # Set the default permissions for all log files.
-#
-$FileOwner rsyslog_priv_drop_to_group
+$FileOwner root
 $FileGroup {{ syslog_file_group }}
 $FileCreateMode 0640
 $DirCreateMode 0755
 $Umask 0022
 
-#
-# Where to place spool and state files
-#
-$WorkDirectory {{ syslog_work_directory }}
-
-#
 # Include all config files in /etc/rsyslog.d/
-#
 $IncludeConfig /etc/rsyslog.d/*.conf
+
+{% if ansible_os_family == "RedHat" %}
+# Turn off message reception via local log socket;
+# local messages are retrieved through imjournal now.
+$OmitLocalLogging on
+
+# File to store the position in the journal
+$IMJournalStateFile imjournal.state
+{% endif %}

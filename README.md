@@ -21,7 +21,7 @@ syslog_tcp_port: 514
 Dependencies
 ------------
 
-- ivoamorim.logrotate
+None
 
 Example Playbook
 ----------------
@@ -35,7 +35,7 @@ Example Playbook
     syslog_tcp_port: 514
 
   roles:
-    - role: ivoamorim.selinux
+    - role: ivoamorim.syslog
 ```
 
 License

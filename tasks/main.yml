@@ -1,22 +1,24 @@
 ---
-- include_vars: "{{ ansible_os_family }}.yml"
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Install syslog
   package:
     name: "rsyslog"
     state: present
 
-- name: Setup syslog configure
+- name: Ensure syslog service is started and enabled
+  service:
+    name: rsyslog
+    state: started
+    enabled: true
+
+- name: Setup syslog configuration
   template:
     src: "{{ item.name }}.j2"
     dest: "{{ item.path }}"
-    backup: yes
   notify:
     - restart rsyslog
   with_items:
     - { name: "rsyslog", path: "/etc/rsyslog.conf" }
     - { name: 'rsyslog-rules', path: "/etc/rsyslog.d/default.conf" }
-
-- name: Setup logrotate
-  include_role:
-    name: ivoamorim.logrotate

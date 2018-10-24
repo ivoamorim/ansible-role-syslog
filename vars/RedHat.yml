@@ -1,18 +1,3 @@
 ---
-rsyslog_file_group: wheel
-rsyslog_work_directory: /var/lib/rsyslog
-
-logrotate:
-  name: syslog
-  syslog_path: /etc/logrotate.d/rsyslog
-  weekly_paths:
-    - /var/log/kern
-    - /var/log/cron
-  daily_paths:
-    - /var/log/daemon.log
-    - /var/log/maillog
-    - /var/log/secure
-    - /var/log/user
-    - /var/log/messages
-  scripts:
-    postrotate: "/bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true"
+syslog_file_group: wheel
+syslog_work_directory: /var/lib/rsyslog
